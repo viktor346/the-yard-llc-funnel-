@@ -65,11 +65,61 @@ const UNLOCK_KEY = 'gforce_report_unlocked';
 
 // Main initialization
 window.addEventListener('DOMContentLoaded', () => {
+    // 1. Capture UTM parameters for forwarding
+    const urlParams = new URLSearchParams(window.location.search);
+    const utms = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+    const activeUtms = {};
+    
+    utms.forEach(param => {
+        if (urlParams.get(param)) {
+            activeUtms[param] = urlParams.get(param);
+        }
+    });
+
+    // 2. Forward UTMs to all assessment links
+    if (Object.keys(activeUtms).length > 0) {
+        const queryString = new URLSearchParams(activeUtms).toString();
+        document.querySelectorAll('a[href*="docs.google.com/forms"]').forEach(link => {
+            const separator = link.href.includes('?') ? '&' : '?';
+            link.href += separator + queryString;
+        });
+    }
+
+    // 3. Track all outbound link clicks + Tag social/main site links
+    document.querySelectorAll('a').forEach(link => {
+        const href = link.href;
+        
+        // Tag main site and social links with funnel source for their analytics
+        if (href.includes('theyard.sg') || href.includes('instagram.com') || href.includes('facebook.com')) {
+            if (!href.includes('#') && !href.includes('utm_source')) {
+                const separator = href.includes('?') ? '&' : '?';
+                link.href += separator + 'utm_source=gforce_funnel&utm_medium=referral&utm_campaign=lcc_2026';
+            }
+        }
+
+        link.addEventListener('click', (e) => {
+            const href = link.href;
+            if (href && (href.startsWith('http') || href.includes('wa.me'))) {
+                trackClick(href, link.innerText || 'Icon Link');
+            }
+        });
+    });
+
     // Check if user has already unlocked the report
     if (localStorage.getItem(UNLOCK_KEY) === 'true') {
-        revealReport(false); // Reveal immediately without animation
+        revealReport(false); 
     }
 });
+
+function trackClick(url, label) {
+    if (typeof gtag === 'function') {
+        gtag('event', 'click_outbound', {
+            'event_category': 'Outbound Links',
+            'event_label': label.trim(),
+            'destination_url': url
+        });
+    }
+}
 
 document.getElementById('gforce-lead-form').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -83,11 +133,15 @@ document.getElementById('gforce-lead-form').addEventListener('submit', async fun
     loadingSpinner.classList.remove('hidden');
 
     const formData = new FormData(this);
+    const urlParams = new URLSearchParams(window.location.search);
     const data = {
         parentName: formData.get('parentName'),
         email: formData.get('email'),
         childName: formData.get('childName') || 'N/A',
         childAge: formData.get('childAge') || 'N/A',
+        utm_source: urlParams.get('utm_source') || 'direct',
+        utm_medium: urlParams.get('utm_medium') || 'none',
+        utm_campaign: urlParams.get('utm_campaign') || 'none',
         timestamp: new Date().toISOString()
     };
 
@@ -135,9 +189,14 @@ document.getElementById('gforce-lead-form').addEventListener('submit', async fun
     
     // 4. Trigger GA4 Lead Event
     if (typeof gtag === 'function') {
+        // Capture UTMs for the event
+        const urlParams = new URLSearchParams(window.location.search);
         gtag('event', 'generate_lead', {
             'event_category': 'Leads',
-            'event_label': 'G-Force Science Report Reveal'
+            'event_label': 'G-Force Science Report Reveal',
+            'source': urlParams.get('utm_source') || 'direct',
+            'medium': urlParams.get('utm_medium') || 'none',
+            'campaign': urlParams.get('utm_campaign') || 'none'
         });
     }
 });
@@ -233,7 +292,7 @@ function renderFacts() {
                             <h3 class="text-3xl font-black text-white uppercase tracking-tighter mb-2">Ready to Benchmark?</h3>
                             <p class="text-gray-400 max-w-md">Secure a private technical evaluation to identify your child's high-performance markers.</p>
                         </div>
-                        <a href="https://docs.google.com/forms/d/e/1FAIpQLScyhU67h4_9-fK-uP6fP6O-pC07p1W6G4P6H6G4P6H6G4P6H6A/viewform" target="_blank" 
+                        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfkpTp72hoSPIq3kH-0-DsRVfvIg9mrXrjHt6gzkrZZIlWVbg/viewform" target="_blank" 
                            class="w-full md:w-auto px-10 py-5 red-gradient rounded-full font-black text-white text-lg uppercase tracking-widest hover:scale-105 transition-transform shadow-2xl shadow-red-900/40 text-center">
                             Fast-Track Assessment
                         </a>

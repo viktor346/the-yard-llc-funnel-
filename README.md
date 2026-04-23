@@ -5,15 +5,14 @@ A high-conversion performance analytics funnel built for **The Yard**. Optimized
 ## 📂 Project Structure
 - `index.html`: The main funnel page (HTML5, Tailwind CSS, Responsive).
 - `script.js`: Frontend logic, GA4 event triggers, and Google Sheets integration.
-- `google-apps-script.js`: A backup of the server-side code currently running on your Google Sheet.
-- `SVG/`: Original vector assets (Logo, Banners) for reference.
+- `google-apps-script.js`: A backup of the server-side code for your Google Sheet.
 
 ## 🚀 Deployment Instructions
-This project is self-contained and ready to be uploaded to any web server (HostGator, Bluehost, AWS, GitHub Pages, etc.).
+This project is self-contained and ready for deployment.
 
-1. **Upload**: Move all files in this directory to your server's public folder (usually `public_html` or `/www`).
-2. **Analytics**: To track visitors, open `index.html` and replace `G-XXXXXXXXXX` (Lines 69 & 74) with your **Google Analytics 4 Measurement ID**.
-3. **Google Sheets**: The lead capture is already linked to your live Google Sheet.
+1. **Upload**: Move all files in this directory to your server's public folder.
+2. **Analytics**: Open `index.html` and replace `G-XXXXXXXXXX` with your **GA4 Measurement ID**.
+3. **Google Sheets**: The lead capture is linked to a Google Apps Script webhook.
     - **Leads Spreadsheet**: [View your leads here](https://docs.google.com/spreadsheets/d/1LIZ66KbOH93Fmeksq27wjeoXO6SRW82LO2AtzWP3rJc/)
     - **Technical Setup**: The script uses a "Hidden Form" method to bypass security restrictions when running from different domains.
 

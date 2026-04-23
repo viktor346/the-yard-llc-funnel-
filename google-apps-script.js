@@ -19,8 +19,8 @@ function doPost(e) {
     
     // Add headers if sheet is empty
     if (sheet.getLastRow() === 0) {
-      sheet.appendRow(['Timestamp', 'Parent Name', 'Email', 'Child Name']);
-      sheet.getRange(1, 1, 1, 4).setFontWeight('bold').setBackground('#00F2FF');
+      sheet.appendRow(['Timestamp', 'Parent Name', 'Email', 'Child Name', 'Child Age', 'Source', 'Medium', 'Campaign']);
+      sheet.getRange(1, 1, 1, 8).setFontWeight('bold').setBackground('#f2cd00').setFontColor('#000000');
     }
     
     // Append the lead data
@@ -28,7 +28,11 @@ function doPost(e) {
       data.timestamp,
       data.parentName,
       data.email,
-      data.childName
+      data.childName,
+      data.childAge,
+      data.utm_source,
+      data.utm_medium,
+      data.utm_campaign
     ]);
     
     return ContentService.createTextOutput(JSON.stringify({ status: 'success' }))
